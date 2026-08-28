@@ -1,3 +1,12 @@
+
+### Table of Contents
+  
+
+  * [Chapter 1](#chapter-1)
+  * [Chapter 2](#chapter-2)
+
+
+
 ### Chapter 1
 
 RNG
@@ -12,16 +21,16 @@ x
 Tutorial 
 
 ```r
-2+2 # addition (input)
-5*5 + 2 # multiplication and addition
-5/5 - 3 # division and subtraction
-log(exp(pi)) # log, exponential, pi
-sin(pi/2) # sinusoids
-2^(-2) # power
-sqrt(8) # square root
--1:5 # sequences
-seq(1, 10, by=2) # sequences
-rep(2, 3) # repeat 2 three times
+2+2            # addition (input)
+5*5 + 2        # multiplication and addition
+5/5 - 3        # division and subtraction
+log(exp(pi))   # log, exponential, pi
+sin(pi/2)      # sinusoids
+2^(-2)         # power
+sqrt(8)        # square root
+-1:5           # sequences
+seq(1, 10, by=2)  # sequences
+rep(2, 3)         # repeat 2 three times
 
 x <- 1 + 2 # put 1 + 2 in object x
 x = 1 + 2 # same as above with fewer keystrokes
@@ -57,8 +66,7 @@ main="Gambler's Ruin")
 set.seed(15432)
 k = 5; lmbd = 2; N = 0:k
 t = cumsum(rexp(k, rate=lmbd))
-tsplot(c(0,t), N, type='s', gg=TRUE, ylab=bquote(N[~t]), pch=19, col=4,
-main="Counting Process")
+tsplot(c(0,t), N, type='s', gg=TRUE, ylab=bquote(N[~t]), pch=19, col=4, main="Counting Process")
 points(c(0,t), N, col=4, pch=19)
 segments(t[k], N[k+1], 8.5, N[k+1], col=4, lty=1)
 
@@ -98,3 +106,9 @@ for (n in c(5, 20, 100)){                    # sample sizes
  abline(v=2, col=2, lwd=2)
  }
 ```
+
+[<sub>top</sub>](#table-of-contents)
+
+<br/>
+
+### Chapter 2

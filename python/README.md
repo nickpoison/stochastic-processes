@@ -1,5 +1,9 @@
 # Stochastic Processes and Its Applications — Python Companion
 
+&#128526; For this text, I had Claude&trade; go through the R code and make a Python version... this is the result. I have checked everything a few times and everything seems valid. Check out [this quickstart](python/quickstart%20for%20people%20without%20local%20Python.md) if you need a place to start.
+
+---
+
 Python translations of the R code from David Stoffer's
 *Stochastic Processes and Its Applications, With R Examples* (Springer).
 
