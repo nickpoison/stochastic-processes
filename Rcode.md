@@ -1,3 +1,12 @@
+This is a list of the R code in the text. New scripts and data sets were included in the package `astsa` to cover many of the examples. So rather than repeating it... install the package (once) and the load it each time you try something in the text. 
+
+```r
+install.packages("astsa")   # do this once if you don't have it
+library(astsa)              # load it as needed for examples
+```
+
+
+
 
 ### Table of Contents
   
@@ -51,8 +60,6 @@ is.na(x)
 sum(is.na(x)) # number of TRUEs
 sum(!is.na(x)) # number of FALSEs
 
-install.packages("astsa")
-library(astsa) # needed for examples
 par(mfcol=c(2,2), cex=.9) # multifigure plot, 2 rows 2 cols - cex for larger labels
 
 ##-- Gambler’s Ruin --##
