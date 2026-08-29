@@ -487,11 +487,11 @@ curve(pexp(x, rate = 1/ave), add=TRUE, col=2, lwd=2)
 legend('topleft', c('CDF', 'EDF'), col=2*1:2, lty=1, pch=c(NA,20), bg='white')
 
 # CVM test
-library(gofedf)          # install it if you don't have it
-gofedf::testExponential(GGBsuicide)
+if (!requireNamespace("gofedf")) install.packages("gofedf")  # install it if you don't have it
+gofedf::testExponential(GGBsuicide)      # do it like this and you don't need to load it       
 
 # Correlation tests
-library(DescTools)      # install it if you don't have it
+if (!requireNamespace("DescTools")) install.packages("DescTools")  
 DescTools::VonNeumannTest(GGBsuicide)
 DescTools::BartelsRankTest(GGBsuicide)
 ```
