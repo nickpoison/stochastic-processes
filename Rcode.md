@@ -192,19 +192,16 @@ library(igraph) # load the package
 # build the matrix of links (edges)
 P = diag(0, 9) # 9 x 9 matrix of zeros
 # put a 1 for each link - note page 4 doesn’t have links
-P[1,] = c(0,0,1,1,1,0,1,0,1)
-P[2,] = c(0,0,0,1,1,0,1,0,0)  
-P[3,] = c(0,0,0,0,1,0,1,0,0)
-P[5,] = c(0,0,0,0,0,0,1,0,0)
-P[6,] = c(1,0,0,1,1,0,1,0,0)
-P[7,] = c(1,0,1,1,1,1,0,1,0)
-P[8,] = c(0,0,0,1,0,0,1,0,0)
-P[9,] = c(0,0,0,1,1,1,1,0,0)
+P[1, c(3:5,7,9)] = 1
+P[2, c(4,5,7)]   = 1
+P[3, c(5,7)]     = 1
+P[5, 7]          = 1
+P[6, c(1,4,5,7)] = 1
+P[7, c(1,3:6,8)] = 1
+P[8, c(4,7)]     = 1
+P[9, 4:7]        = 1
 # next, make the graph and then plot it
-(Pgraph <- graph_from_adjacency_matrix(P, weighted=TRUE))
-[1] 1->3 1->4 1->5 1->7 1->9 2->4 2->5 2->7 3->5 3->7
-[11] 5->7 6->1 6->4 6->5 6->7 7->1 7->3 7->4 7->5 7->6
-[21] 7->8 8->4 8->7 9->4 9->5 9->6 9->7
+( Pgraph <- graph_from_adjacency_matrix(P, weighted=TRUE) )
 plot(Pgraph, asp=0, vertex.size=2.5*degree(Pgraph))  
 # finally, get the associated eigenvector (PageRanks)
 round(as.matrix(page_rank(Pgraph)$vector), 2)
