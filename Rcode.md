@@ -463,10 +463,9 @@ legend('topleft', c('CDF', 'EDF'), col=2*1:2, lty=1, pch=c(NA,20), bg='white')
 if (!requireNamespace("gofedf")) install.packages("gofedf")  # install it if you don't have it
 gofedf::testExponential(GGBsuicide)      # do it like this and you don't need to load it       
 
-# Correlation tests
-if (!requireNamespace("DescTools")) install.packages("DescTools")  
-DescTools::VonNeumannTest(GGBsuicide)
-DescTools::BartelsRankTest(GGBsuicide)
+# BDS test
+if (!requireNamespace("tseries")) install.packages("tseries")  # install it if you don't have it
+tseries::bds.test(GGBsuicide, m = 3)
 ```
 
 [<sub>top</sub>](#table-of-contents)
