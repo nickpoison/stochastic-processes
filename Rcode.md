@@ -85,7 +85,7 @@ for (n in c(5, 20, 100)){                    # sample sizes
 ```r
 # probability that one exponential is less than the other
 # in the call: ntrials is optional, but means for X and Y are not
-PrXltY <- function(ntrials=10000, meanX, meanY){
+PrXltY <- function(ntrials=2*10^5, meanX, meanY){
   ntrials = ntrials                # use the value specified
   X = rexp(ntrials, rate=1/meanX)  # generate X exponentials
   Y = rexp(ntrials, rate=1/meanY)  # generate Y exponentials
@@ -93,8 +93,6 @@ PrXltY <- function(ntrials=10000, meanX, meanY){
 } # end
 # now run it
 PrXltY(meanX=1500, meanY=1000)
-#  Estimate     True 
-#    0.4042   0.4000 
 ```
 
 
