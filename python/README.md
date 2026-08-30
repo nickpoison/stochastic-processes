@@ -4,11 +4,9 @@
 
 ---
 
-Python translations of the R code from David Stoffer's
-*Stochastic Processes and Its Applications, With R Examples* (Springer).
+Python translations of the R code from *Stochastic Processes and Its Applications, With R Examples* (Springer).
 
-This is a companion, not a replacement — the book is written in R, and the
-`astsa` R package it uses is not fully ported here. Instead, this repo:
+The book is written in R, and the `astsa` R package it uses is not fully ported here. Instead, this repo:
 
 - gives Python equivalents for the R code that actually appears in the text
   and problems, chapter by chapter
@@ -20,20 +18,19 @@ This is a companion, not a replacement — the book is written in R, and the
 
 ## Datasets
 
-Only five real datasets are referenced in this book (everything else is
-simulated in-code): `EQcount`, `gnp`, `polio`, `sp500w`, `djia`, plus
-`GGBsuicide` (used in the Poisson-process/exponential-waiting-time
-section of Chapter 5).
+Five real datasets are referenced in the book (everything else is simulated 
+in-code): `EQcount`, `GGBsuicide`, `gnp`, `polio`, `sp500w`, `djia`.
+
 
 ```python
 from stocproc_tools import load
 
-eq = load("EQcount")       # earthquake counts per year, 1900-2006
-gnp = load("gnp")           # US GNP, quarterly
-polio = load("polio")       # US polio cases, monthly
+eq = load("EQcount")          # earthquake counts per year, 1900-2006
+gnp = load("gnp")             # US GNP, quarterly
+polio = load("polio")         # US polio cases, monthly
 suicide = load("GGBsuicide")  # waiting times (days) between events
-djia = load("djia")         # Dow Jones OHLCV, daily
-sp500 = load("sp500w")      # S&P 500 weekly returns
+djia = load("djia")           # Dow Jones OHLCV, daily
+sp500 = load("sp500w")        # S&P 500 weekly returns
 ```
 
 These CSVs were generated from the R `astsa` package's `.rda` files using
@@ -101,16 +98,9 @@ that file if you want to pull in additional `astsa` datasets later).
   convention.
 - `scatter_hist()` — scatterplot with marginal histograms.
 
-This closes out everything actually called in this book's text. See
+This closes out everything called in this book's text. See
 `ch5/ch5_spectral.py` for a runnable demo of the last two.
 
-Still not ported (found to be unused by this book when checked): `trend()`
-(only the English word "trend" appears in the text, never the function),
-the multivariate coherency/phase panels of `mvspec()`, and the broader
-`astsa` surface not touched by this text (`Kfilter`/`Ksmooth`/`EM`
-state-space versions, `specenv`/`autoSpec`/`autoParm`, `SV.mcmc`/`ar.mcmc`,
-etc.) -- see the note earlier in this README about the difference between
-"what this book needs" and "a full astsa port."
 
 ## Structure
 
@@ -130,8 +120,8 @@ See `requirements.txt`. Core: `numpy`, `pandas`, `scipy`, `matplotlib`,
 ## Status / scope
 
 This intentionally does **not** attempt a full port of the `astsa` R
-package (it's ~50 functions and ~75 datasets, many of them research-grade
-code with no direct Python equivalent — e.g. `SV.mcmc`, `autoSpec`,
-`specenv`). It covers only what this specific book uses. If you need the
-full `astsa` surface, see the (early-stage) community port at
-https://github.com/shishitao/astsa.
+package, many of the scripts are research-grade code with no direct 
+Python equivalent. If you need the full `astsa`,  see the (early-stage) 
+community port at https://github.com/shishitao/astsa.
+
+

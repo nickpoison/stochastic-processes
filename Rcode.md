@@ -30,12 +30,13 @@ library(astsa)   # load it as needed for examples
 ```r
 library(astsa)  # in case you scrolled past the note above 
 
+par(mfcol=c(2,2))
+
 ##-- Gambler’s Ruin --##
 set.seed(111)
 u = sample(c(-1,1), 20, replace=TRUE)
 x = ts(c(10, 10+cumsum(u)), start=0)
-tsplot(x, type='o', xlab='n', gg=TRUE, pch=19, ylab=bquote(X[~n]), col=4,
-main="Gambler's Ruin")
+tsplot(x, type='o', xlab='n', gg=TRUE, pch=19, ylab=bquote(X[~n]), col=4, main="Gambler's Ruin")
 
 ##-- Counting/Poisson Process --##
 set.seed(15432)
@@ -80,7 +81,7 @@ for (n in c(5, 20, 100)){                    # sample sizes
  }
 ```
 
-<br/>  Simulation for Problem 1.5 (c)
+<br/>  Simulation for Problem 1.5 (c) - it could help with part (d)
 
 ```r
 # probability that one exponential is less than the other
