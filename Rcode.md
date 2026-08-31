@@ -484,7 +484,7 @@ epsilon_val  = 0.5 * IQR(y)
 
 # Calculate original statistic
 orig_bds  = bds.test(y, m = embedding_dim, eps = epsilon_val)
-orig_stat = orig_bds$statistic[embedding_dim - 1]
+orig_stat = orig_bds$statistic[embedding_dim - 1, 1]
 
 # Estimate the lambda 
 lambda_est <- 1 / mean(y)
