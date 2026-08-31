@@ -278,7 +278,6 @@ contour(x,y,z, drawlabels=FALSE, col=gray(.5), nlevels=20, add=TRUE)
 
 <br/> Gibbs Sampling - Prevalence of Breast Cancer
 
-> To emphasize: This is point-in-time prevalence among asymptomatic women presenting for screening; i.e., the probability that a woman being screened right now has undetected breast cancer at that moment, and not the often-quoted lifetime risk of about 13% (roughly 1 in 8), which is a cumulative probability over a woman’s entire life and is a very different quantity. 
 
 ```r
 set.seed(91210)
@@ -477,14 +476,16 @@ tseries::bds.test(GGBsuicide, m = 3)
 library(tseries)
 set.seed(1)
 
-y             = GGBsuicide
+y = GGBsuicide   
 embedding_dim = 3
-# for skewed data, we use a distance metric based on data spread rather than SD
+# for skewed data, we'll use a distance metric based on data spread 
+# rather than SD, even tho for an exponential, the IQR and standard
+# deviation are nearly the same
 epsilon_val  = 0.5 * IQR(y) 
 
 # Calculate original statistic
 orig_bds  = bds.test(y, m = embedding_dim, eps = epsilon_val)
-orig_stat = orig_bds$statistic[embedding_dim - 1, 1]
+orig_stat = orig_bds$statistic[embedding_dim-1, 1]   
 
 # Estimate the lambda 
 lambda_est <- 1 / mean(y)
@@ -504,7 +505,7 @@ for(i in 1:B) {
 # Calculate p-value
 boot_p_value = sum(abs(boot_stats) >= abs(orig_stat)) / B
 print(boot_p_value)
-# .944 -- awesome!
+# .949 -- awesome!
 ```
 
 
