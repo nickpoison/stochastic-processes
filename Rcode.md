@@ -468,6 +468,46 @@ if (!requireNamespace("tseries")) install.packages("tseries")  # install it if y
 tseries::bds.test(GGBsuicide, m = 3)
 ```
 
+```r
+#############################################################
+#   The suggestion for skewed data is to do a bootstrap     #
+#   it's not in the text but it's done here                 #
+#   and supports the conclusion in the text                 #
+#############################################################
+library(tseries)
+set.seed(1)
+
+y             = GGBsuicide
+embedding_dim = 3
+# for skewed data, we use a distance metric based on data spread rather than SD
+epsilon_val  = 0.5 * IQR(y) 
+
+# Calculate original statistic
+orig_bds  = bds.test(y, m = embedding_dim, eps = epsilon_val)
+orig_stat = orig_bds$statistic[embedding_dim - 1]
+
+# Estimate the lambda 
+lambda_est <- 1 / mean(y)
+
+# Bootstrap
+B           = 1000
+boot_stats = numeric(B)
+N          = length(y)
+
+for(i in 1:B) {
+  boot_sample = rexp(N, rate = lambda_est)
+  
+  boot_bds = bds.test(boot_sample, m = embedding_dim, eps = epsilon_val)
+  boot_stats[i] = boot_bds$statistic[embedding_dim - 1]
+}
+
+# Calculate p-value
+boot_p_value = sum(abs(boot_stats) >= abs(orig_stat)) / B
+print(boot_p_value)
+# .944 -- awesome!
+```
+
+
 [<sub>top</sub>](#table-of-contents)
 
 <br/>
