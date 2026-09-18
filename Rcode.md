@@ -408,6 +408,67 @@ abline(v=quantile(lam, probs=c(.05,.50,.95)))
 curve(dgamma(x,a0+n,b0+X),0,1, add=TRUE, col=2) # true posterior
 ```
 
+<br/>
+Metropolis within Gibbs
+
+```r
+##-- data --##
+set.seed(8675309)
+n        = 30
+true_mu  = 5
+true_s2  = 4
+x        = rnorm(n, mean = true_mu, sd = sqrt(true_s2))
+##-- prior hyperparameters --##
+a0  = 2      # InvGamma shape for sigma2
+b0  = 2      # InvGamma rate  for sigma2
+tau = 10     # Cauchy scale for mu (location 0)
+##-- prior and posterior for mu --##
+log_prior_mu = function(mu) dcauchy(mu, location=0, scale=tau, log=TRUE)
+log_post_mu  = function(mu, sigma2, x) {
+  sum(dnorm(x, mean=mu, sd=sqrt(sigma2), log=TRUE)) + log_prior_mu(mu)
+}
+##-- MCMC settings --##
+n_iter   = 20000
+burn_in  = 2000
+prop_sd  = 0.7     # tuning parameter for the random walk on mu
+mu_chain     = numeric(n_iter)
+sigma2_chain = numeric(n_iter)
+accept        = 0
+## -- initial values --##
+mu     = 0
+sigma2 = 1
+for (t in 1:n_iter) {
+ # (1) Gibbs step: sigma2 | mu, data  ~ InvGamma(a0 + n/2, b0 + 0.5*sum((x-mu)^2))
+  shape_n = a0 + n / 2
+  rate_n  = b0 + 0.5 * sum((x - mu)^2)
+  sigma2  = 1 / rgamma(1, shape=shape_n, rate=rate_n)
+ # (2) Metropolis step: mu | sigma2, data
+  mu_prop   = rnorm(1, mean = mu, sd = prop_sd)
+  log_ratio = log_post_mu(mu_prop, sigma2, x) - log_post_mu(mu, sigma2, x)
+  if (log(runif(1)) < log_ratio) {
+    mu      = mu_prop
+    accept  = accept + 1
+  }
+  mu_chain[t]     = mu
+  sigma2_chain[t] = sigma2
+}
+cat("Metropolis acceptance rate for mu:", round(accept / n_iter, 3), "\n")
+##-- posterior summaries (after  burn_in) --##
+keep = (burn_in + 1):n_iter
+cat("Posterior mean of mu: ", round(mean(mu_chain[keep]), 3),"(true =", true_mu,")\n")   
+cat("Posterior mean of sigma2: ", round(mean(sigma2_chain[keep]), 3),"(true =", true_s2,")\n")
+##-- trace plots --##
+par(mfrow = c(2, 2), cex=.9)
+tsplot(mu_chain[keep], main="Trace of mu", col=4, ylab=bquote(mu), xlab="index")
+ abline(h=mean(mu_chain[keep]), col=2)
+tsplot(sigma2_chain[keep], main="Trace of sigma2", col=4, ylab=bquote(sigma^2), xlab="index")
+ abline(h=mean(sigma2_chain[keep]), col=2)
+hist(mu_chain[keep], breaks=40, main="Posterior of mu", xlab =bquote(mu), col=astsa.col(4, .5))
+ abline(v=mean(mu_chain[keep]), col=2)
+hist(sigma2_chain[keep], breaks=40, main="Posterior of sigma2", xlab=bquote(sigma^2), col=astsa.col(4, .5))
+ abline(v=mean(sigma2_chain[keep]), col=2)
+```
+
 [<sub>top</sub>](#table-of-contents)
 
 <br/>
