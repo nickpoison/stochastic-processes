@@ -223,6 +223,61 @@ pie %*% P # is it pie?
 
 ### Chapter 3
 
+<br/> It Never Rains
+
+> Note: This example is done without using the `markovchain` package because it is simple to generate the data and get the eigenvalues using base R.
+
+```r
+set.seed(8675309)
+namz = c('sunny', 'cloudy', 'rainy')
+
+##-- transition matrix --##
+(P = matrix(c(.94, .04, .02,
+              .34, .56, .10,
+              .34, .20, .46), 3, byrow=TRUE, dimnames=list(namz, namz) ))
+ev = eigen(t(P)); pi = Re(ev$vectors[,1]); names(pi)=namz;
+(pi = pi/sum(pi))
+
+##-- simulation --##
+burn=150; num = 10000; n = burn+num
+x = numeric(n); x[1] = 1
+for (i in 2:n) x[i] = sample(1:3, 1, prob=P[x[i-1],])
+xall = x
+x = x[-(1:burn)]
+
+# estimate m_xx
+for (j in 1:3) {
+  returns = diff(which(x==j))
+  cat(namz[j],": pi =", c(.85,.10,.05)[j], " m_xx =", round(1/c(.85,.10,.05)[j],2), sep='',
+      " observed =", round(mean(returns),2), "\n")
+}
+
+##-- graphic --##
+layout(matrix(1:2,2), height=c(1.15, 1))
+#- first 100 observations
+y = x[1:100]
+culers = c(3, 4, 2)
+par(bty='n', oma=c(0,1,0,0))
+tsplot(y , type='s', col=8, ylab=NA, xlab='n', yaxt='n', ny=NA)
+ axis(2, at=1:3, las=1, labels = namz)
+ abline(h=1:3, col=gray(.92))
+ lines(y ,type='s', col=8)
+ points(y , pch=20,  col=culers[y])
+ mtext(bquote(X[~n]), side=2, at=2.5, las=1, line=2)
+#- mean revisits
+j = 2       # cloudy
+visits  = which(xall==j)
+returns = diff(visits)
+tt      = sum(visits <= burn)                       # visits during burn-in
+runmean = ts(cumsum(returns)/seq_along(returns), start=-tt)
+tsplot(runmean, col=4, ylab=NA, xlab='Number of Revisits', lwd=1.5, las=1, ylim=c(0,25))
+ mtext(bquote(hat(m)[.(j)*.(j)]), side=2, line=1.75, las=1)
+ lines(-tt:-1, runmean[1:tt], col=2, lwd=2)          # burn-in part
+ clip(-100,1000,0,100)
+ abline(h=1/pi[j], col=8, lty=2
+```
+
+
 <br/> Ehrenfest Chain
 
 ```r
@@ -430,7 +485,7 @@ log_post_mu  = function(mu, sigma2, x) {
 ##-- MCMC settings --##
 n_iter   = 20000
 burn_in  = 2000
-prop_sd  = 0.7     # tuning parameter for the random walk on mu
+prop_sd  = 0.8     # tuning parameter for the random walk on mu
 mu_chain     = numeric(n_iter)
 sigma2_chain = numeric(n_iter)
 accept        = 0
@@ -475,28 +530,82 @@ hist(sigma2_chain[keep], breaks=40, main="Posterior of sigma2", xlab=bquote(sigm
 
 ### Chapter 4
 
-<br/> Graph of a Pure Jump Markov Chain (not in the text)
+<br/> How to Generate a Continuous Time Markov Chain
 
 ```r
-par(tcl=-.2, las=1)
-N = c(rep(0,7), rep(2,5), rep(1,14), rep(3,4), rep(5,9), rep(3,6))
-tsplot(N, type='n', ylab=bquote(X[~t]), axes=FALSE,  col=4, gg=TRUE) 
-axis(2, at=0:5, col='white', col.ticks=1)
-lines(N, type='s', col=4)
- jmp = N[jmpt <- c(8,13,27,31,40)] 
- bjmp = c(0, lag(N,-1))
- points(jmpt, jmp, col=4, pch=19, lwd=1.5)
- points(jmpt, bjmp[jmpt], col=4, pch=1)
-axis(1, line=0, col='white', col.ticks =2, lwd.ticks = 3, cex.axis=1.2, at=jmpt, labels=c(expression(tau[1]), expression(tau[2]), expression(tau[3]), expression(tau[4]), expression(tau[5])))
-segments(0,0, 1,0, col=4)
-mtext(0, side=1, at=0, cex=.85)
+set.seed(90210)
+##-- Model specification --##
+states = c(1, 2, 3)
+q      = c(2, 5, 1)   # q_x = rate of leaving state x
+Q = matrix( c(  0,  1/2,   1/2,   # embedded chain transition matrix
+              3/5,    0,   2/5,
+                1,    0,     0),  nrow=3, byrow=TRUE)             
+##-- Function to simulate a path --##
+genX = function(x0, q, Q, states, t_max) {
+        x = x0            # current state 
+        t = 0             # current time
+    times = t             # jump times
+    path  = states[x]     # states visited
+  while (t < t_max) {
+#- (i) holding time in current state ~ Exp(q_x)
+     hold = rexp(1, rate = q[x])
+     t    = t + hold
+     if (t >= t_max) break
+#- (ii) choose next state according to row x of Q
+    x     = sample(seq_along(states), size=1, prob=Q[x, ])
+    times = c(times, t)
+    path  = c(path, states[x])
+  }
+   data.frame(time=times, state=path)
+}
+# run it and display the results  
+( X = genX(x0=1, q=q, Q=Q, states=states, t_max=5) )  
+tsplot(X$time, X$state, type='s')   
 ```
+
+<br/> Bacterial Tacos
+
+```r
+## Inputs:  
+##       X0 - initial population size  
+##        p - split probability 
+##        q - Exponential rate     
+##    t_max - total time horizon to simulate
+##       dt - tau-leap step size (default 0.01)
+## Returns: (a data frame)
+##    time  - vector of time points, up to t_max or to extinction.
+##    count - simulated population size X_t at each corresponding time.
+simulate_branching <- function(X0, p, q, t_max, dt=0.01) {
+  lambda  = p * q
+  mu      = (1 - p) * q
+  n_steps = t_max / dt
+  x       = X0
+  times   = c(0, numeric(n_steps))
+  count   = c(x, numeric(n_steps))
+  for (i in 1:n_steps) {
+    births = rpois(1, lambda * x * dt)
+    deaths = rpois(1, mu * x * dt)
+    x      = max(x + births - deaths, 0)
+    times[i+1] = i * dt
+    count[i+1] = x
+    if (x == 0) {
+      times = times[1:(i + 1)]
+      count = count[1:(i + 1)]
+      break
+    }
+  }
+  data.frame(time = times, count)
+}
+# Results for a supercritical pool party - plot on log scale
+result = simulate_branching(X0=1e6, p=.7, q=.5, t_max=24) 
+tsplot(result$time, result$count, col=4, ylab=bquote(X[~t]), log='y') 
+```
+
 
 <br/> Example of a PP
 
 ```r
 # generate PP example
-libray(astsa)
 set.seed(666)
 k = 10        # stop after k arrivals
 lmbda = 1/2   # rate
